@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+# -*- makefile-gmake -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+#Disable longjmp sanity checks in glibc for m68k
+ifeq ($(DEB_HOST_ARCH),m68k)
+	CFLAGS += -D_FORTIFY_SOURCE=0
+endif
+
+%:
+	dh $@
+
+override_dh_autoreconf_clean:
+	dh_autoreconf_clean
+	rm -rf m4
+	if test -f acinclude.m4; then mv acinclude.m4 aclocal.m4; fi
+
+override_dh_autoreconf:
+	mv aclocal.m4 acinclude.m4
+	mkdir -p m4
+	dh_autoreconf

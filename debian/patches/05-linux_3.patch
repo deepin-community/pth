@@ -1,0 +1,21 @@
+Description: Linux 3/4/5 configure check
+Author: Mikael Pettersson <mikpe at it.uu.se>
+Last_Update: 2019-08-16
+
+## https://lists.fedoraproject.org/pipermail/scm-commits/2012-June/804968.html
+##
+## Thanks to Raul Porcel to notify.
+
+Index: pth/aclocal.m4
+===================================================================
+--- pth.orig/aclocal.m4
++++ pth/aclocal.m4
+@@ -1074,7 +1074,7 @@ case $PLATFORM in
+         braindead=no
+         case "x`uname -r`" in
+ changequote(, )dnl
+-            x2.[23456789]* ) ;;
++            x2.[23456789]* | x3.[0-9]* | x4.[0-9]* | x5.[0-9]* ) ;;
+ changequote([, ])
+             * ) braindead=yes ;;
+         esac

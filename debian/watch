@@ -1,0 +1,2 @@
+version=3
+https://ftp.gnu.org/gnu/pth/ pth-(\d.*)\.tar\.gz

@@ -1,0 +1,16 @@
+Description: Add missing dependency
+Author: NIIBE Yutaka
+Last_Update: 2019-08-16
+
+Index: pth/Makefile.in
+===================================================================
+--- pth.orig/Makefile.in
++++ pth/Makefile.in
+@@ -448,6 +448,7 @@ pth_sync.lo: pth_sync.c pth_p.h pth_vers
+ pth_syscall.lo: pth_syscall.c pth_p.h pth_vers.c pth.h pth_acdef.h pth_acmac.h
+ pth_tcb.lo: pth_tcb.c pth_p.h pth_vers.c pth.h pth_acdef.h pth_acmac.h
+ pth_time.lo: pth_time.c pth_p.h pth_vers.c pth.h pth_acdef.h pth_acmac.h
++pth_uctx.lo: pth_uctx.c pth_p.h pth_vers.c pth.h pth_acdef.h pth_acmac.h
+ pth_util.lo: pth_util.c pth_p.h pth_vers.c pth.h pth_acdef.h pth_acmac.h
+ pth_vers.lo: pth_vers.c pth_vers.c
+ pthread.o: pthread.c pthread.h pth_p.h pth_vers.c pth.h pth_acdef.h pth_acmac.h

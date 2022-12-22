@@ -1,0 +1,244 @@
+Description: Fix for newer autoconf
+Author: NIIBE Yutaka
+Last_Update: 2019-08-19
+
+Index: pth/aclocal.m4
+===================================================================
+--- pth.orig/aclocal.m4
++++ pth/aclocal.m4
+@@ -90,7 +90,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_SRCDIR_PREFIX(<varname>)
+ dnl ##
+ 
+-AC_DEFUN(AC_SRCDIR_PREFIX,[
++AC_DEFUN([AC_SRCDIR_PREFIX],[
+ ac_prog=[$]0
+ changequote(, )dnl
+ ac_srcdir=`echo $ac_prog | sed -e 's%/[^/][^/]*$%%' -e 's%\([^/]\)/*$%\1%'`
+@@ -118,7 +118,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_ENABLESUBDIR
+ dnl ##
+ 
+-AC_DEFUN(AC_ENABLESUBDIR,[
++AC_DEFUN([AC_ENABLESUBDIR],[
+ AC_ARG_ENABLE(subdir,dnl
+ [  --enable-subdir         enable local building as subdirectory (default=no)],[dnl
+ ],[dnl
+@@ -139,7 +139,7 @@ dnl ##                <vers-var>, <vers-
+ dnl ##                <copyright>)
+ dnl ##
+ 
+-AC_DEFUN(AC_HEADLINE,[dnl
++AC_DEFUN([AC_HEADLINE],[dnl
+ #   configuration header
+ if test ".`echo dummy [$]@ | grep enable-subdir`" != .; then
+     enable_subdir=yes
+@@ -185,7 +185,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_PLATFORM(<variable>)
+ dnl ##
+ 
+-AC_DEFUN(AC_PLATFORM,[
++AC_DEFUN([AC_PLATFORM],[
+ if test ".$host" != .; then
+     $1="$host"
+ else
+@@ -205,8 +205,8 @@ dnl ##  configure.ac:
+ dnl ##    AC_CONFIG_PARAM(<file>)
+ dnl ##
+ 
+-AC_DEFUN(AC_CONFIG_PARAM,[
+-AC_DIVERT_PUSH(-1)
++AC_DEFUN([AC_CONFIG_PARAM],[
++AC_DIVERT_PUSH(KILL)
+ AC_ARG_WITH(param,[  --with-param=ID[[,ID,..]] load parameters from $1])
+ AC_DIVERT_POP()
+ AC_DIVERT_PUSH(NOTICE)
+@@ -294,7 +294,7 @@ dnl ##    AC_COMPILER_OPTION(<name>, <di
+ dnl ##                       <action-success>, <action-failure>)
+ dnl ##
+ 
+-AC_DEFUN(AC_COMPILER_OPTION,[dnl
++AC_DEFUN([AC_COMPILER_OPTION],[dnl
+ AC_MSG_CHECKING(for compiler option $2)
+ AC_CACHE_VAL(ac_cv_compiler_option_$1,[
+ cat >conftest.$ac_ext <<EOF
+@@ -324,7 +324,7 @@ dnl ##    AC_CHECK_LONGLONG
+ dnl ##    AC_CHECK_LONGDOUBLE
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_LONGLONG,[dnl
++AC_DEFUN([AC_CHECK_LONGLONG],[dnl
+ AC_MSG_CHECKING(for built-in type long long)
+  AC_CACHE_VAL(ac_cv_type_longlong,[dnl
+   AC_TRY_LINK([
+@@ -343,7 +343,7 @@ if test ".$ac_cv_type_longlong" = .yes;
+ fi
+ ])dnl
+ 
+-AC_DEFUN(AC_CHECK_LONGDOUBLE,[dnl
++AC_DEFUN([AC_CHECK_LONGDOUBLE],[dnl
+ AC_MSG_CHECKING(for built-in type long double)
+  AC_CACHE_VAL(ac_cv_type_longdouble,[dnl
+   AC_TRY_LINK([
+@@ -369,7 +369,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_CHECK_DEBUGGING
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_DEBUGGING,[dnl
++AC_DEFUN([AC_CHECK_DEBUGGING],[dnl
+ AC_ARG_ENABLE(debug,dnl
+ [  --enable-debug          build for debugging (default=no)],
+ [dnl
+@@ -426,7 +426,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_CHECK_PROFILING
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_PROFILING,[dnl
++AC_DEFUN([AC_CHECK_PROFILING],[dnl
+ AC_MSG_CHECKING(for compilation profile mode)
+ AC_ARG_ENABLE(profile,dnl
+ [  --enable-profile        build for profiling (default=no)],
+@@ -454,7 +454,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_CHECK_BUILDPARAM
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_BUILDPARAM,[dnl
++AC_DEFUN([AC_CHECK_BUILDPARAM],[dnl
+ dnl #   determine build mode
+ AC_MSG_CHECKING(whether to activate batch build mode)
+ AC_ARG_ENABLE(batch,dnl
+@@ -500,7 +500,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_CHECK_OPTIMIZE
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_OPTIMIZE,[dnl
++AC_DEFUN([AC_CHECK_OPTIMIZE],[dnl
+ AC_ARG_ENABLE(optimize,dnl
+ [  --enable-optimize       build with optimization (default=no)],
+ [dnl
+@@ -551,7 +551,7 @@ dnl ##  acconfig.h:
+ dnl ##    #undef HAVE_<define>
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_DEFINE,[dnl
++AC_DEFUN([AC_CHECK_DEFINE],[dnl
+ AC_MSG_CHECKING(for define $1 in $2)
+ AC_CACHE_VAL(ac_cv_define_$1,
+ [AC_EGREP_CPP([YES_IS_DEFINED], [
+@@ -576,7 +576,7 @@ dnl ##  acconfig.h:
+ dnl ##    #undef HAVE_<typedef>
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_TYPEDEF,[dnl
++AC_DEFUN([AC_CHECK_TYPEDEF],[dnl
+ AC_REQUIRE([AC_HEADER_STDC])dnl
+ AC_MSG_CHECKING(for typedef $1)
+ AC_CACHE_VAL(ac_cv_typedef_$1,
+@@ -602,7 +602,7 @@ dnl ##  acconfig.h:
+ dnl ##    #undef HAVE_<attr>
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_STRUCTATTR,[dnl
++AC_DEFUN([AC_CHECK_STRUCTATTR],[dnl
+ AC_REQUIRE([AC_HEADER_STDC])dnl
+ AC_MSG_CHECKING(for attribute $1 in struct $2 from $3)
+ AC_CACHE_VAL(ac_cv_structattr_$1,[dnl
+@@ -629,7 +629,7 @@ dnl ##    AC_CHECK_ARGTYPE(<header> [...
+ dnl ##                     <max-arg-number>, <action-with-${ac_type}>)
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_ARGTYPE,[dnl
++AC_DEFUN([AC_CHECK_ARGTYPE],[dnl
+ AC_REQUIRE_CPP()dnl
+ AC_MSG_CHECKING([for type of argument $3 for $2()])
+ AC_CACHE_VAL([ac_cv_argtype_$2$3],[
+@@ -782,7 +782,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_TEST_FILE(<file>, <success-action>, <failure-action>)
+ dnl ##
+ 
+-AC_DEFUN(AC_TEST_FILE, [
++AC_DEFUN([AC_TEST_FILE], [
+ ac_safe=`echo "$1" | sed 'y%./+-%__p_%'`
+ AC_MSG_CHECKING([for $1])
+ AC_CACHE_VAL(ac_cv_file_$ac_safe, [
+@@ -831,7 +831,7 @@ dnl #   case that this type should be de
+ dnl #   system being compiled for was created in the window of POSIX
+ dnl #   madness.
+ 
+-AC_DEFUN(AC_CHECK_SOCKLENTYPE,[dnl
++AC_DEFUN([AC_CHECK_SOCKLENTYPE],[dnl
+ AC_CHECK_TYPEDEF(socklen_t, sys/socket.h)
+ AC_CHECK_ARGTYPE(sys/types.h sys/socket.h, accept, 3, 3, [:])
+ AC_MSG_CHECKING(for fallback socklen_t)
+@@ -856,7 +856,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_CHECK_NFDSTYPE(<action-with-${ac_type}>)
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_NFDSTYPE,[dnl
++AC_DEFUN([AC_CHECK_NFDSTYPE],[dnl
+ AC_CHECK_TYPEDEF(nfds_t, poll.h)
+ AC_CHECK_ARGTYPE(sys/types.h poll.h, poll, 2, 3, [:])
+ AC_MSG_CHECKING(for fallback nfds_t)
+@@ -890,7 +890,7 @@ dnl ##        ...stack grow up...
+ dnl ##    #endif
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_STACKGROWTH,[dnl
++AC_DEFUN([AC_CHECK_STACKGROWTH],[dnl
+ AC_MSG_CHECKING(for direction of stack growth)
+ AC_CACHE_VAL(ac_cv_check_stackgrowth, [
+ cross_compiling=no
+@@ -944,7 +944,7 @@ dnl ##  configure.ac:
+ dnl ##    AC_CHECK_SJLJ(<success-action>, <failure-action>, <type-var>)
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_SJLJ,[dnl
++AC_DEFUN([AC_CHECK_SJLJ],[dnl
+ AC_MSG_CHECKING(for signal-mask aware setjmp(3)/longjmp(3))
+ AC_CACHE_VAL(ac_cv_check_sjlj, [
+ AC_IFALLYES(func:setjmp func:longjmp, ac_cv_check_sjlj=sjlje, ac_cv_check_sjlj=none)
+@@ -1119,7 +1119,7 @@ dnl ##  source.c:
+ dnl ##    #include "config.h"
+ dnl ##    ...<define>...
+ 
+-AC_DEFUN(AC_CHECK_NSIG,[dnl
++AC_DEFUN([AC_CHECK_NSIG],[dnl
+ AC_MSG_CHECKING(for number of signals)
+ cross_compiling=no
+ AC_TRY_RUN(
+@@ -1166,7 +1166,7 @@ dnl ##
+ dnl ##  configure.in:
+ dnl ##    AC_CHECK_FDSETSIZE(<varname>)
+ 
+-AC_DEFUN(AC_CHECK_FDSETSIZE,[dnl
++AC_DEFUN([AC_CHECK_FDSETSIZE],[dnl
+ dnl #   1. determine default value
+ AC_MSG_CHECKING(for default value of FD_SETSIZE)
+ cross_compiling=no
+@@ -1237,7 +1237,7 @@ dnl ##  shell:
+ dnl ##      $ ./configure --with-<libname>[=DIR]
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_EXTLIB,[dnl
++AC_DEFUN([AC_CHECK_EXTLIB],[dnl
+ AC_ARG_WITH($2, [dnl
+ [  --with-]m4_substr([$2[[=DIR]]                     ], 0, 19)[build with external $1 library (default=no)]], [dnl
+     if test ".$with_$2" = .yes; then
+@@ -1340,7 +1340,7 @@ dnl ##  configure.ac:
+ dnl ##     AC_CHECK_MCSC(<success-action>, <failure-action>)
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_MCSC, [
++AC_DEFUN([AC_CHECK_MCSC], [
+ AC_MSG_CHECKING(for usable SVR4/SUSv2 makecontext(2)/swapcontext(2))
+ AC_CACHE_VAL(ac_cv_check_mcsc, [
+ AC_TRY_RUN([
+@@ -1427,7 +1427,7 @@ dnl ##    xxx.sp_ss   = <macro-addr>(ska
+ dnl ##    xxx.sp_size = <macro-size>(skaddr, sksize);
+ dnl ##
+ 
+-AC_DEFUN(AC_CHECK_STACKSETUP,[dnl
++AC_DEFUN([AC_CHECK_STACKSETUP],[dnl
+ dnl #   check for consistent usage
+ ifelse($1,[sigstack],,[
+ ifelse($1,[sigaltstack],,[

@@ -1,0 +1,21 @@
+Description: LDFLAGS for shared library build
+Author: NIIBE Yutaka
+Last_Update: 2013-07-08
+
+Index: pth/Makefile.in
+===================================================================
+--- pth.orig/Makefile.in
++++ pth/Makefile.in
+@@ -168,10 +168,10 @@ pth_p.h: $(S)pth_p.h.in
+ 
+ #   build the static and possibly shared libraries
+ libpth.la: $(LOBJS)
+-	$(LIBTOOL) --mode=link --quiet $(CC) -o libpth.la $(LOBJS) \
++	$(LIBTOOL) --mode=link --quiet $(CC) $(LDFLAGS) -o libpth.la $(LOBJS) \
+ 	-rpath $(libdir) -version-info `$(SHTOOL) version -lc -dlibtool $(_VERSION_FILE)`
+ libpthread.la: pthread.lo $(LOBJS)
+-	$(LIBTOOL) --mode=link --quiet $(CC) -o libpthread.la pthread.lo $(LOBJS) \
++	$(LIBTOOL) --mode=link --quiet $(CC) $(LDFLAGS) -o libpthread.la pthread.lo $(LOBJS) \
+ 	-rpath $(libdir) -version-info `$(SHTOOL) version -lc -dlibtool $(_VERSION_FILE)`
+ 
+ #   build the manual pages

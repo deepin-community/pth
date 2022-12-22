@@ -1,0 +1,10 @@
+01-ia64.patch
+03-hurd-pth_mctx.patch
+04-exit_on_failed_test.patch
+05-linux_3.patch
+06-ldflags.patch
+07-test_uctx_fix.patch
+09-configure-ac.patch
+10-Makefile-in.patch
+11-autoconf-macros.patch
+12-reproducible-pth-config.patch

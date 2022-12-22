@@ -1,0 +1,33 @@
+Description: Fix for reproducible pth-config
+Author: NIIBE Yutaka
+Last_Update: 2019-08-19
+
+Index: pth/configure.ac
+===================================================================
+--- pth.orig/configure.ac
++++ pth/configure.ac
+@@ -628,6 +628,11 @@ dnl #   whether to build against Dmalloc
+ AC_CHECK_EXTLIB(Dmalloc, dmalloc, dmalloc_debug, dmalloc.h,
+                 AC_DEFINE(PTH_DMALLOC, 1, [define if using Dmalloc in GNU pth]))
+ 
++dnl #
++CFLAGS_FOR_PTH_CONFIG=`echo "$CFLAGS" |\
++  sed -e 's/-f@<:@a-z@:>@*-prefix-map=@<:@^ @:>@* //'`
++AC_SUBST(CFLAGS_FOR_PTH_CONFIG)
++
+ dnl ##
+ dnl ##  OUTPUT SUBSTITUTION
+ dnl ##
+Index: pth/pth-config.in
+===================================================================
+--- pth.orig/pth-config.in
++++ pth/pth-config.in
+@@ -38,7 +38,7 @@ pth_includedir="@includedir@"
+ pth_mandir="@mandir@"
+ pth_datadir="@datadir@"
+ pth_acdir="@datadir@/aclocal"
+-pth_cflags="@CFLAGS@"
++pth_cflags="@CFLAGS_FOR_PTH_CONFIG@"
+ pth_ldflags="@LDFLAGS@"
+ pth_libs="@LIBS@"
+ pth_version="@PTH_VERSION_STR@"

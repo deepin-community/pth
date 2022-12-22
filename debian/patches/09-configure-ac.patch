@@ -1,0 +1,234 @@
+Description: Fix configure.ac for newer autotools
+Author: NIIBE Yutaka
+Last_Update: 2019-08-16
+
+Index: pth/configure.ac
+===================================================================
+--- pth.orig/configure.ac
++++ pth/configure.ac
+@@ -32,11 +32,13 @@ dnl ##  PROLOG
+ dnl ##
+ 
+ dnl #   standard Autoconf prolog
+-AC_PREREQ(2.52)dnl
++AC_PREREQ([2.69])dnl
+ AC_REVISION([1.0])
+ 
+ dnl #   autoconf initialization
+-AC_INIT(README)
++AC_INIT
++AC_CONFIG_SRCDIR([README])
++AC_CONFIG_MACRO_DIR([m4])
+ AC_ENABLESUBDIR
+ AC_SRCDIR_PREFIX(srcdir_prefix)
+ AC_HEADLINE(dnl
+@@ -57,28 +59,19 @@ AC_MSG_PART(Build Tools)
+ AC_PROG_CC
+ AC_PROG_CPP
+ AC_PROG_EGREP
+-AC_SET_MAKE
++AC_PROG_MAKE_SET
+ AC_CHECK_DEBUGGING
+ AC_CHECK_PROFILING
+ AC_CHECK_OPTIMIZE
+-if test -f "$srcdir/ltmain.sh"; then
+-    case "$PLATFORM" in
+-        #   Solaris 2.7/x86 is slightly broken
+-        *-pc-solaris2.[[78]] [)] enable_shared=no ;;
+-    esac
+-    sinclude(libtool.m4)
+-    AC_PROG_LIBTOOL
+-else
+-    dnl # only for stripped down Pth source tree
+-    AC_CHECK_PROG(AR, ar, ar)
+-    AC_PROG_RANLIB
+-fi
++
++LT_PREREQ([2.2.6])
++LT_INIT([shared static])
+ 
+ dnl ##  Support for some special platform/compiler options
+ case "$PLATFORM:$CC" in
+     *-sun-solaris2*:cc )
+         #   shut-up harmless warnings caused by do-while macros on Solaris
+-        test ".$ac_cv_prog_gcc" = ".no" && CFLAGS="$CFLAGS -w"
++        test ".$ac_cv_c_compiler_gnu" = ".no" && CFLAGS="$CFLAGS -w"
+         ;;
+     *-*-sysv*uw[[27]]*:cc )
+         #   shut-up harmless warnings caused by do-while macros on UnixWare
+@@ -133,9 +126,9 @@ AC_MSG_PART(Mandatory Platform Environme
+ 
+ dnl # check for standard headers
+ AC_HEADER_STDC
+-AC_HAVE_HEADERS(dnl
++AC_CHECK_HEADERS([dnl
+    stdio.h stdlib.h stdarg.h string.h signal.h unistd.h setjmp.h fcntl.h dnl
+-   errno.h sys/types.h sys/time.h sys/wait.h sys/stat.h sys/socket.h)
++   errno.h sys/types.h sys/time.h sys/wait.h sys/stat.h sys/socket.h])
+ AC_CHECK_FUNCS(dnl
+    gettimeofday select sigaction sigprocmask sigpending sigsuspend)
+ AC_BEGIN_DECISION([mandatory system headers and functions])
+@@ -175,7 +168,7 @@ AC_SUBST(PTH_FAKE_POLL)
+ AC_MSG_RESULT([$msg])
+ 
+ dnl # check for readv/writev environment
+-AC_HAVE_HEADERS(sys/uio.h)
++AC_CHECK_HEADERS([sys/uio.h])
+ AC_CHECK_FUNCS(readv writev)
+ AC_MSG_CHECKING(whether readv(2)/writev(2) facility has to be faked)
+ AC_IFALLYES(func:readv func:writev header:sys/uio.h, PTH_FAKE_RWV=0, PTH_FAKE_RWV=1)
+@@ -191,7 +184,7 @@ dnl # check for various other functions
+ AC_CHECK_FUNCS(usleep strerror)
+ 
+ dnl # check for various other headers which we might need
+-AC_HAVE_HEADERS(sys/resource.h net/errno.h paths.h)
++AC_CHECK_HEADERS([sys/resource.h net/errno.h paths.h])
+ 
+ dnl # at least the test programs need some socket stuff
+ AC_CHECK_LIB(nsl, gethostname)
+@@ -202,7 +195,7 @@ AC_CHECK_LIB(socket, accept)
+ 
+ dnl # check whether we've to use a non-standard #include <sys/select.h>  to get
+ dnl # the definition for fd_set under AIX and other brain-dead platforms.
+-AC_HAVE_HEADERS(sys/select.h)
++AC_CHECK_HEADERS([sys/select.h])
+ EXTRA_INCLUDE_SYS_SELECT_H="#include <sys/select.h>"
+ if test ".$ac_cv_header_sys_select_h" != .yes; then
+     EXTRA_INCLUDE_SYS_SELECT_H="/* $EXTRA_INCLUDE_SYS_SELECT_H */"
+@@ -259,18 +252,16 @@ AC_CHECK_STRUCTATTR(ss_sp,   sigaltstack
+ dnl # check for gettimeofday() variant
+ AC_MSG_CHECKING(for a single-argument based gettimeofday)
+ cross_compile=no
+-AC_TRY_COMPILE([
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <unistd.h>
+-],[
++]], [[
+ struct timeval tv;
+ (void)gettimeofday(&tv);
+-],
+-msg="yes"
+-,
+-msg="no"
+-)
++]])],[msg="yes"
++],[msg="no"
++])
+ case $PLATFORM in
+     *-*-aix4* ) msg="no" ;; # on AIX the compiler test doesn't work
+     *-*-isc* )  msg="no" ;; # on ISC the compiler test doesn't work
+@@ -283,16 +274,14 @@ AC_MSG_RESULT([$msg])
+ dnl # check for struct timespec
+ AC_MSG_CHECKING(for struct timespec)
+ cross_compile=no
+-AC_TRY_COMPILE([
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ #include <time.h>
+ #include <sys/time.h>
+-],[
++]], [[
+ struct timespec ts;
+-],
+-msg="yes"
+-,
+-msg="no"
+-)
++]])],[msg="yes"
++],[msg="no"
++])
+ if test ".$msg" = .yes; then
+     AC_DEFINE(HAVE_STRUCT_TIMESPEC, 1, [define if exists "struct timespec"])
+ fi
+@@ -359,7 +348,7 @@ elif test ".$sjlj" = .yes; then
+          sjljlx|sjljisc|sjljw32 ) mctx_stk=none
+     esac
+ else
+-    AC_ERROR([no appropriate mctx method found])
++    AC_MSG_ERROR(no appropriate mctx method found)
+ fi
+ 
+ dnl #
+@@ -370,21 +359,21 @@ AC_ARG_WITH(mctx-mth,dnl
+ [  --with-mctx-mth=ID      force mctx method      (mcsc,sjlj)],[
+ case $withval in
+     mcsc|sjlj ) mctx_mth=$withval ;;
+-    * ) AC_ERROR([invalid mctx method -- allowed: mcsc,sjlj]) ;;
++    * ) AC_MSG_ERROR(invalid mctx method -- allowed: mcsc,sjlj) ;;
+ esac
+ ])dnl
+ AC_ARG_WITH(mctx-dsp,dnl
+ [  --with-mctx-dsp=ID      force mctx dispatching (sc,ssjlj,sjlj,usjlj,sjlje,...)],[
+ case $withval in
+     sc|ssjlj|sjlj|usjlj|sjlje|sjljlx|sjljisc|sjljw32 ) mctx_dsp=$withval ;;
+-    * ) AC_ERROR([invalid mctx dispatching -- allowed: sc,ssjlj,sjlj,usjlj,sjlje,sjljlx,sjljisc,sjljw32]) ;;
++    * ) AC_MSG_ERROR(invalid mctx dispatching -- allowed: sc,ssjlj,sjlj,usjlj,sjlje,sjljlx,sjljisc,sjljw32) ;;
+ esac
+ ])dnl
+ AC_ARG_WITH(mctx-stk,dnl
+ [  --with-mctx-stk=ID      force mctx stack setup (mc,ss,sas,...)],[
+ case $withval in
+     mc|ss|sas|none ) mctx_stk=$withval ;;
+-    * ) AC_ERROR([invalid mctx stack setup -- allowed: mc,ss,sas,none]) ;;
++    * ) AC_MSG_ERROR(invalid mctx stack setup -- allowed: mc,ss,sas,none) ;;
+ esac
+ ])dnl
+ 
+@@ -590,7 +579,7 @@ if test ".$enable_pthread" = .yes; then
+     TEST_PTHREAD=test_pthread
+     enable_syscall_soft=yes
+     PTH_SYSCALL_SOFT=1
+-    AC_HAVE_HEADERS(pthread.h)
++    AC_CHECK_HEADERS([pthread.h])
+     ac_warn=no
+     if test ".$ac_cv_header_pthread_h" = .yes; then
+         warn=yes
+@@ -645,17 +634,19 @@ dnl ##
+ 
+ AC_MSG_PART(Output Substitution)
+ 
+-AC_OUTPUT(dnl
+-Makefile dnl
+-pthread-config dnl
+-pthread.h dnl
+-pth-config dnl
+-pth.h dnl
+-pth_acmac.h dnl
+-,dnl
++AC_CONFIG_FILES([
++Makefile
++pthread-config
++pthread.h
++pth-config
++pth.h
++pth_acmac.h
++])
++AC_CONFIG_COMMANDS([default],[
+ chmod +rx pthread-config
+ chmod +rx pth-config
+-)dnl
++],[])
++AC_OUTPUT
+ if test ".$enable_pthread" = .no; then
+     rm -f pthread-config
+     rm -f pthread.h
+Index: pth/aclocal.m4
+===================================================================
+--- pth.orig/aclocal.m4
++++ pth/aclocal.m4
+@@ -410,14 +410,6 @@ case "$CFLAGS" in
+           * ) AC_COMPILER_OPTION(pipe, -pipe, -pipe, CFLAGS="$CFLAGS -pipe") ;;
+ esac
+ fi
+-case "$CFLAGS" in
+-    *-g* ) CFLAGS=`echo "$CFLAGS" |\
+-                   sed -e 's/ -g / /g' -e 's/ -g$//' -e 's/^-g //g' -e 's/^-g$//'` ;;
+-esac
+-case "$CXXFLAGS" in
+-    *-g* ) CXXFLAGS=`echo "$CXXFLAGS" |\
+-                     sed -e 's/ -g / /g' -e 's/ -g$//' -e 's/^-g //g' -e 's/^-g$//'` ;;
+-esac
+ msg="disabled"
+ ])dnl
+ AC_MSG_CHECKING(for compilation debug mode)
